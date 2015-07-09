@@ -44,26 +44,24 @@ class GrabCnblogPost():
             post = soup.find(id='cnblogs_post_body')
             if not post:
                 return
-            post_string = self.get_post(post, '')
+            post_string = self.__get_post__(post, '')
             new_folder = self.__creat_folder__(output_path,title)
             with open(os.path.join(new_folder, title.string + '.txt'), 'wb') as  blogfile:
                 blogfile.write(post_string.encode('utf-8'))
         return
-    def get_post(self, post_html, str):
+    def __get_post__(self, post_html, str):
         for post_child in post_html.descendants:
             if post_child.string != None and type(post_child) == bs4.element.NavigableString:
                 str += post_child.string
 
+            elif post_child.string != None and type(post_child) == bs4.element.Tag:
+                if post_child.name == 'a':
+                    str += post_child['href'] + '\n '
+
             elif post_child.string == None:
-                self.get_post(post_child, str)
-                imgs = post_child.find_all('img')
-                if imgs:
-                    for i in imgs:
-                        str += i['src'] + '\n '
-                hrefs = post_child.find_all('a')
-                if hrefs:
-                    for h in hrefs:
-                        str += h['href'] + '\n '
+                self.__get_post__(post_child, str)
+                if post_child.name == 'img':
+                    str += post_child['src'] + '\n '
 
         return  str
 
