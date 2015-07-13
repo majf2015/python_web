@@ -44,24 +44,43 @@ class GrabCnblogPost():
             post = soup.find(id='cnblogs_post_body')
             if not post:
                 return
-            post_string = self.__get_post__(post, '')
+
+            post_string = self.__get_post__(post)
             new_folder = self.__creat_folder__(output_path,title)
             with open(os.path.join(new_folder, title.string + '.txt'), 'wb') as  blogfile:
                 blogfile.write(post_string.encode('utf-8'))
         return
-    def __get_post__(self, post_html, str):
-        for post_child in post_html.descendants:
+
+    def __get_post__(self, post_html):
+        str = ""
+        for post_child in post_html.children:
             if post_child.string != None and type(post_child) == bs4.element.NavigableString:
-                str += post_child.string
+                if post_child.string != '\n':
+                    str += post_child.string
+                continue
 
             elif post_child.string != None and type(post_child) == bs4.element.Tag:
                 if post_child.name == 'a':
-                    str += post_child['href'] + '\n '
+                    str += post_child.string
+                    str += '[' + post_child['href'] +']'
+                elif post_child.name == 'td':
+                    str += post_child.string + '||'
+                else:
+                    str += post_child.string
 
             elif post_child.string == None:
-                self.__get_post__(post_child, str)
-                if post_child.name == 'img':
-                    str += post_child['src'] + '\n '
+                try:
+                    str += self.__get_post__(post_child)
+                    if post_child.name == 'img':
+                        str += '['+ post_child['src'] + ']\n '
+                except:
+                    print "error"
+
+            if post_child.name == 'tr'or  post_child.name == 'br' or post_child.name == 'p' \
+                    or post_child.name == 'h1' or post_child.name == 'h2' or post_child.name == 'h3'\
+                    or post_child.name == 'h4':
+                str += '\n'
+
 
         return  str
 
@@ -79,10 +98,11 @@ class GrabCnblogPost():
         self.__get_blog__(output_path, self.url_list)
 
 grab = GrabCnblogPost('catch')
-grab.get_all_post(r'D:\python\python_practice\web\blog')
+grab.get_all_post(r'D:\blog')
 
-#grab.set_name("good")
-#grab.get_all_post(r'D:\python\python_practice\web\blog1')
+
+
+
 
 
 
