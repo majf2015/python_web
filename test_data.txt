@@ -1,0 +1,18 @@
+##############################
+测试网页
+get
+http://testengineer.sinaapp.com/web
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<h2>这是本人业余开发的订阅号，做得不够好请见谅！</h2>
+
+</body>
+</html>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+k f
+
+
+
