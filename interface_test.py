@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
-import urllib2
 
-class Interface:
-    def __init__(self, n, t, u, e, r = u'未测试'):
+import urllib2
+import time
+from bs4 import BeautifulSoup
+
+
+
+class InterfaceAttribute:
+    def __init__(self, n, t, u, e, d):
         self.name = n
         self.type = t
         self.url = u
         self.expect = e
-        self.result = r
+        self.data = d
+        self.result = u'未测试'
 
     def get_name(self):
         return self.name
@@ -32,8 +38,9 @@ class Interface:
             return  '##############################\n' + self.get_name() + ' : ' + \
                 self.get_url() + '\n' + self.get_run_result() + '\n'
 
-        return  '##############################\n' + self.get_name() + ' : ' + \
-                self.get_url() + '\n' + self.get_run_result() + '\n' + self.get_expect_result()
+        return  '##############################\n' + self.get_name() + ' : ' + self.get_url() + '\n' \
+                + 'Error ! run result : \n' + self.get_run_result() + '\n' + 'expect result : \n' \
+                + self.get_expect_result()
 
 class InterfaceTest:
 
@@ -43,8 +50,8 @@ class InterfaceTest:
 
     def get_test(self):
         for i in self.url:
-            response = urllib2.urlopen(i.get_url()).read()
-
+            response = BeautifulSoup(urllib2.urlopen(i.get_url()).read(), "html.parser").find('body')\
+                .get_text().replace('\n', '').encode('utf-8')
             if response == i.get_expect_result():
                 i.set_run_result('Successfully')
             else:
@@ -58,7 +65,7 @@ class InterfaceTest:
             print i.tostring()
 
     def read(self):
-        with open('test_data.txt', 'rb') as file:
+        with open('test_data.txt') as file:
             while True:
                 line = file.readline()[0: -1]
                 if line == '##############################':
@@ -67,19 +74,23 @@ class InterfaceTest:
                     url = file.readline()[0: -1]
                     expect = ''
                     while True:
-                        e = file.readline()
-                        if e == '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n':
+                        e = file.readline()[0: -1]
+                        if e == '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@':
                             break
                         expect += e
-                    self.url.append(Interface(name, type, url, expect))
+                    data = {}
+                    #POST 参数
+                    self.url.append(InterfaceAttribute(name, type, url, expect, data))
                 if line == '':
                     break
 
     def write(self):
         string = ''
+        ISOTIMEFORMAT='%Y-%m-%d %X'
+        string += '\n\n' + time.strftime( ISOTIMEFORMAT, time.localtime(time.time())) + '\n\n'
         for i in self.url:
             string += i.tostring()
-        with open('run_result.txt', 'wb') as file:
+        with open('run_result.txt', 'ab') as file:
             file.write(string)
 
     def run_test(self):
