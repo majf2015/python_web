@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import urllib2
+import urllib2, urllib
 import time
-from bs4 import BeautifulSoup
-
 
 
 class InterfaceAttribute:
@@ -18,17 +16,20 @@ class InterfaceAttribute:
     def get_name(self):
         return self.name
 
+    def get_type(self):
+        return self.type
+
     def get_url(self):
          return self.url
 
     def get_expect_result(self):
         return self.expect
 
+    def get_data(self):
+        return self.data
+
     def get_run_result(self):
         return self.result
-
-    def get_type(self):
-        return self.type
 
     def set_run_result(self, result):
         self.result = result
@@ -40,7 +41,7 @@ class InterfaceAttribute:
 
         return  '##############################\n' + self.get_name() + ' : ' + self.get_url() + '\n' \
                 + 'Error ! run result : \n' + self.get_run_result() + '\n' + 'expect result : \n' \
-                + self.get_expect_result()
+                + self.get_expect_result() + '\n'
 
 class InterfaceTest:
 
@@ -48,17 +49,20 @@ class InterfaceTest:
         self.url = []
         self.read()
 
-    def get_test(self):
-        for i in self.url:
-            response = BeautifulSoup(urllib2.urlopen(i.get_url()).read(), "html.parser").find('body')\
-                .get_text().replace('\n', '').encode('utf-8')
-            if response == i.get_expect_result():
-                i.set_run_result('Successfully')
-            else:
-                i.set_run_result(response)
+    def get_test(self, object):
+        response = urllib2.urlopen(object.get_url()).read().replace('\n', '')
+        if response == object.get_expect_result():
+            object.set_run_result('Successfully')
+        else:
+            object.set_run_result(response)
 
-    def post_test(self):
-        pass
+    def post_test(self, object):
+        data = urllib.urlencode(object.get_data())
+        response = urllib2.urlopen(object.get_url(), data).read().replace('\n', '')
+        if  response == object.get_expect_result():
+            object.set_run_result('Successfully')
+        else:
+            object.set_run_result(response)
 
     def print_result(self):
         for i in self.url:
@@ -79,7 +83,12 @@ class InterfaceTest:
                             break
                         expect += e
                     data = {}
-                    #POST 参数
+                    if type == 'post':
+                        while True:
+                            e = file.readline()[0: -1]
+                            if e == '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@':
+                                break
+                            data[e.split(' ')[0]] = e.split(' ')[1]
                     self.url.append(InterfaceAttribute(name, type, url, expect, data))
                 if line == '':
                     break
@@ -94,11 +103,11 @@ class InterfaceTest:
             file.write(string)
 
     def run_test(self):
-        for i in self.url:
-            if i.get_type() == 'get':
-                self.get_test()
+        for object in self.url:
+            if object.get_type() == 'get':
+                self.get_test(object)
             else:
-                self.post_test()
+                self.post_test(object)
         self.print_result()
         self.write()
 
