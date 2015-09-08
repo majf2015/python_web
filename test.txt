@@ -1,0 +1,23 @@
+3
+setting_1
+setting_2
+setting_3
+
+setting_1 begin
+a = 32
+b = abc
+c = [12, 234, "aa"]
+setting_1 end
+
+setting_2 begin
+e = 21
+f = 22
+a = [12, 23]
+setting_2 end
+
+setting_2 begin
+e = 21
+f = 22
+a = [12, 23]
+setting_2 end
+
