@@ -48,7 +48,11 @@ class Main:
 
                     #begin
                     name = re.compile('\s+').split(begin)[0]
-                    self.read_area_key(file, name)
+                    try:
+                        self.read_area_key(file, name)
+                    except:
+                        print "area end lock "
+                        break
 
     def read_area(self,file):
         for i in range(self.count):
@@ -58,11 +62,19 @@ class Main:
             name = Basic(name)
             self.object.append(name)
 
+
+
+
+
     def read_area_key(self, file, name):
         for i in self.object:
             if i.get_name() == name:
                 line = file.readline()[0 : -1]
                 while re.search('\s*end', line) == None:
+                    while line == '':
+                        line = file.readline()[0 : -1]
+                    if re.search('\s*begin', line) != None:
+                        raise 001
                     key = re.compile('\s*=\s*').split(line)
                     i.set_dic(key[0], key[1])
                     line = file.readline()[0 : -1]
