@@ -3,9 +3,9 @@ import re
 
 
 class Basic:
-    def __init__(self, n, d):
+    def __init__(self, n):
         self.name = n
-        self.dic = d
+        self.dic = {}
 
     def get_name(self):
         return self.name
@@ -17,7 +17,7 @@ class Basic:
         return self.name
 
     def set_dic(self, k, v):
-        pass
+        self.dic[k] = v
 
     def delete_dic(self, k):
         pass
@@ -27,6 +27,7 @@ class Main:
         self.count = 0
         self.object = []
         self.read()
+        self.print_file()
 
     def read(self):
         with open('test.txt') as file:
@@ -35,35 +36,40 @@ class Main:
                 return
             else:
                 self.count = int(line)
-                for i in range(self.count):
-                    name = file.readline()[0 : -1]
-                    while name == '':
-                        name = file.readline()[0 : -1]
-                    data = {}
-                    name = Basic(name, data)
-                    self.object.append(name)
-
+                self.read_area(file)
                 for i in range(self.count):
                     begin = file.readline()[0 : -1]
                     while begin == '':
                         begin = file.readline()[0 : -1]
 
                     #匹配begin
-                    while re.match('\sbegin' ,begin) == None:
+                    while re.search('\s*begin', begin) == None:
                         begin = file.readline()[0 : -1]
 
                     #begin
                     name = re.compile('\s+').split(begin)[0]
-                    print name
-                    for i in self.object:
-                        if i.get_name == name:
-                            line = file.readline()[0 : -1]
-                            while re.match('\send', begin) == None:
-                                key = re.compile('\s*=\s*').split(line)
-                                i.dic[key[0]] = key[1]
-                            break
+                    self.read_area_key(file, name)
+
+    def read_area(self,file):
+        for i in range(self.count):
+            name = file.readline()[0 : -1]
+            while name == '':
+                name = file.readline()[0 : -1]
+            name = Basic(name)
+            self.object.append(name)
+
+    def read_area_key(self, file, name):
+        for i in self.object:
+            if i.get_name() == name:
+                line = file.readline()[0 : -1]
+                while re.search('\s*end', line) == None:
+                    key = re.compile('\s*=\s*').split(line)
+                    i.set_dic(key[0], key[1])
+                    line = file.readline()[0 : -1]
+                break
+
+    def print_file(self):
         print self.count
-        print self.object
         for i in self.object:
             print i.get_name()
             print i.get_dic()
