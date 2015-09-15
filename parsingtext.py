@@ -14,7 +14,7 @@ class Basic:
         return self.dic
 
     def set_name(self, n):
-        return self.name
+        self.name = n
 
     def set_dic(self, k, v):
         self.dic[k] = v
@@ -23,11 +23,16 @@ class Basic:
         pass
 
 class Main:
-    def __init__(self):
+    def __init__(self, hellow):
         self.count = 0
         self.object = []
         self.read()
         self.print_file()
+        self.hellow = hellow
+
+    def __call__(self, *args, **kwargs):
+        self.hellow()
+        print "hellow my decorator"
 
     def read(self):
         with open('test.txt') as file:
@@ -62,10 +67,6 @@ class Main:
             name = Basic(name)
             self.object.append(name)
 
-
-
-
-
     def read_area_key(self, file, name):
         for i in self.object:
             if i.get_name() == name:
@@ -76,7 +77,7 @@ class Main:
                     if re.search('\s*begin', line) != None:
                         raise 001
                     key = re.compile('\s*=\s*').split(line)
-                    i.set_dic(key[0], key[1])
+                    i.set_dic(key[0], self.value_type(key[1]))
                     line = file.readline()[0 : -1]
                 break
 
@@ -85,6 +86,14 @@ class Main:
         for i in self.object:
             print i.get_name()
             print i.get_dic()
+
+
+    def value_type(self, value):
+        try:
+            type_value = eval(value)
+            return type_value
+        except:
+            return value
 
     def write(self):
         pass
@@ -113,4 +122,10 @@ class Main:
     def modify_key(self):
         pass
 
-APP = Main()
+@ Main
+def hellow():
+    print "Decorator"
+
+
+#APP = Main()
+hellow()

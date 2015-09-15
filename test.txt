@@ -15,9 +15,10 @@ f = 22
 a = [12, 23]
 setting_2 end
 
-setting_2 begin
+
+setting_3 begin
 e = 21
 f = 22
 a = [12, 23]
-setting_2 end
+setting_3 end
 
