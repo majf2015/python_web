@@ -5,7 +5,7 @@ setting_3
 
 setting_1 begin
 a = 32
-b = abc
+b = {'z':'abc', 'x':21}
 c = [12, 234, "aa"]
 setting_1 end
 

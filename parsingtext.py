@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
+from functools import wraps
+import time
 
 
 class Basic:
@@ -87,7 +89,21 @@ class Main:
             print i.get_name()
             print i.get_dic()
 
+    def logs(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            times = time.time()
+            #time.sleep(1)
+            result = func(*args, **kwargs)
+            timee = time.time()
+            print "function      = {0}".format(func.__name__)
+            print "    arguments = {0} {1}".format(args, kwargs)
+            print "    return    = {0}".format(result)
+            print "    time      = %.6f sec" % (timee - times)
+            return result
+        return wrapper
 
+    @logs
     def value_type(self, value):
         try:
             type_value = eval(value)
