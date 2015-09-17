@@ -31,10 +31,12 @@ class Main:
         self.read()
         self.print_file()
         self.hellow = hellow
+        self.property_dec = 'my property'
 
     def __call__(self, *args, **kwargs):
         self.hellow()
         print "hellow my decorator"
+
 
     def read(self):
         with open('test.txt') as file:
@@ -111,8 +113,29 @@ class Main:
         except:
             return value
 
-    def write(self):
-        pass
+    @staticmethod
+    def write():
+        print "staticmethod"
+
+    @classmethod
+    def clas(cls):
+        print "classmethod", cls
+
+
+    @property
+    def pro(self):
+        print "property get"
+        return self.property_dec
+
+    @pro.setter
+    def pro(self, value):
+        print "property set"
+        self.property_dec = value
+
+    @pro.deleter
+    def pro(self):
+        print "property delete"
+        del self.property_dec
 
     def query_all_area(self):
         pass
@@ -141,7 +164,26 @@ class Main:
 @ Main
 def hellow():
     print "Decorator"
-
-
-#APP = Main()
+print "-----------------------------------class docorator-----------------------------------"
 hellow()
+
+
+print "-----------------------------------method docorator-----------------------------------"
+APP = Main(hellow)
+#可通过类对像或者类调用
+APP.write()
+Main.write()
+#可通过类对像或者类调用
+APP.clas()
+Main.clas()
+
+#可把方法当属性调用
+print APP.pro
+APP.pro = 123
+
+print APP.pro
+
+
+
+
+
