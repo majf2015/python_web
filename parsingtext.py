@@ -105,10 +105,25 @@ class Main:
             return result
         return wrapper
 
-    @logs
+
+
+    def my_eval(self, value):
+        if value.isdigit():
+            return int(value)
+        elif value[0] == '[' and value[-1] ==']' or value[0] == '{' and value[-1] =='}':
+            value_elements = value[1: -1].split(', ')
+            for i in range(len(value_elements)):
+                value_elements[i] = self.my_eval(value_elements[i])
+            return value_elements
+        else:
+            return value
+
+
+
     def value_type(self, value):
         try:
             type_value = eval(value)
+            #type_value = self.my_eval(value)
             return type_value
         except:
             return value
@@ -164,7 +179,6 @@ class Main:
 @ Main
 def hellow():
     print "Decorator"
-print "-----------------------------------class docorator-----------------------------------"
 hellow()
 
 
