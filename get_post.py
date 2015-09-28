@@ -29,15 +29,15 @@ class CnblogTopPostGrabber:
         self.page = 1
 
     def GrabPostAndSendEmail(self):
-        self.GrabPost()
+        self.GrabPost(self.url)
         self.send_mail(self.urls)
 
-    def GrabPost(self):
-        open_urls =  BeautifulSoup(urllib2.urlopen(self.url,timeout=1500).read(), "html.parser")
+    def GrabPost(self, url):
+        open_urls =  BeautifulSoup(urllib2.urlopen(url,timeout=1500).read(), "html.parser")
         a = open_urls.find_all('a', attrs= {'class': 'titlelnk'})
         p = open_urls.find_all('p', attrs= {'class': 'post_item_summary'})
         print a
-
+        print url
         i = 0
         while i < len(a) and i < self.number:
             self.urls.append(PostObject(a[i].string, a[i].get('href'), p[i].get_text()))
@@ -45,8 +45,8 @@ class CnblogTopPostGrabber:
 
         if len(self.urls) < self.number:
             self.page = self.page + 1
-            self.url = self.url +  '#p%d' % self.page
-            self.GrabPost()
+            url = self.url +  '#p%d' % self.page
+            self.GrabPost(url)
 
 
         self.send_mail(self.urls)
