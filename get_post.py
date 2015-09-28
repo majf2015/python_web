@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import parseaddr, formataddr
 
-class Post_object:
+class PostObject:
     def __init__(self, title, url, summary):
         self.title = title
         self.url = url
@@ -21,37 +21,40 @@ class Post_object:
     def get_summary(self):
         return self.summary
 
-class Post:
+class CnblogTopPostGrabber:
     def __init__(self, url, n):
         self.url = url
         self.number = n
         self.urls = []
-        self.open_index()
+        self.page = 1
 
-    def open_index(self):
-        assign  = '/pick/'
-        self.url += assign
-        self.open_assign()
+    def GrabPostAndSendEmail(self):
+        self.GrabPost()
+        self.send_mail(self.urls)
 
-    def open_assign(self):
+    def GrabPost(self):
         open_urls =  BeautifulSoup(urllib2.urlopen(self.url,timeout=1500).read(), "html.parser")
         a = open_urls.find_all('a', attrs= {'class': 'titlelnk'})
         p = open_urls.find_all('p', attrs= {'class': 'post_item_summary'})
-        for i in range(len(a)):
-            if len(self.urls) < self.number:
-                self.urls.append(Post_object(a[i].string, a[i].get('href'), p[i].get_text()))
-            else:
-                break
+        print a
+
+        i = 0
+        while i < len(a) and i < self.number:
+            self.urls.append(PostObject(a[i].string, a[i].get('href'), p[i].get_text()))
+            i = i + 1
+
         if len(self.urls) < self.number:
-            pass
+            self.page = self.page + 1
+            self.url = self.url +  '#p%d' % self.page
+            self.GrabPost()
 
-        print self.urls
-        self.send(self.urls)
 
-    def send(self,content):
+        self.send_mail(self.urls)
+
+    def send_mail(self,content):
         sender = 'happier<1102103123@qq.com>'
-        #receiver =[ 'happier<1102103123@qq.com>']
-        receiver =[ '1102103123@qq.com', 'majinfeng@shidou.com', '461148972@qq.com']
+        receiver =[ '1021008546@qq.com']
+        #receiver =[ '1102103123@qq.com', 'majinfeng@shidou.com', '461148972@qq.com']
         subject = '博客园精品博文，哈哈！'
         smtpserver = 'smtp.qq.com'
         username = '1102103123@qq.com'
@@ -64,14 +67,12 @@ class Post:
         msg['From'] = formataddr((Header('happier', 'utf-8').encode(), '1102103123@qq.com'))
 
         smtp = smtplib.SMTP(smtpserver)
-        #smtp.set_debuglevel(1)
         smtp.login(username, password)
         smtp.sendmail(sender, receiver, msg.as_string())
         smtp.quit()
 
-
-
-url = 'http://www.cnblogs.com'
-n = 20
-get = Post(url, n)
+url = 'http://www.cnblogs.com/pick/'
+n = 21
+get = CnblogTopPostGrabber(url, n)
+get.GrabPostAndSendEmail()
 
