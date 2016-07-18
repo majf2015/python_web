@@ -5,23 +5,33 @@ from bs4 import BeautifulSoup
 
 class GrabPicture:
     def __init__(self):
-        self.web_url = 'http://tieba.baidu.com/p/2166231880'
-        self.picture_url = []
-        self.new_folder ='E:\GrabPicture'
+        self.web_url = set([ 'http://tieba.baidu.com/p/2166231880','http://tieba.baidu.com/p/2125228667#!/l/p1'])
+        self.picture_url = set()
+        self.new_folder ='E:\GrabPicture\img4'
 
     def get_picture(self):
         self.new_folder = self.creat_folder()
-        self.get_picture_url()
+        for url in self.web_url:
+            self.get_picture_url(url)
         self.save_picture()
 
-    def get_picture_url(self):
-        res = urllib2.urlopen(self.web_url,timeout=1500)
+    def get_picture_url(self, url):
+        res = urllib2.urlopen(url,timeout=1500)
         soup = BeautifulSoup(res.read())
-        for picture_url in soup.find_all('img', attrs={'class' : 'BDE_Image'}):
-            self.picture_url.append(picture_url.get('src'))
+        i = 1
+        for picture_url in soup.find_all('img'):#, attrs={'class' : 'BDE_Image'}):
+            if i>200 :
+                break
+            self.picture_url.add(picture_url.get('src'))
+            self.get_web_url(soup)
+            i += 1
 
-        print len(self.picture_url)
-        print self.picture_url
+        print i
+
+    def get_web_url(self, soup):
+        for web_url in soup.find_all('link'):#, attrs={'class' : 'BDE_Image'}):
+            self.web_url.add(web_url.get('href'))
+
 
     def creat_folder(self):
         if not os.path.isdir(self.new_folder):
@@ -36,6 +46,7 @@ class GrabPicture:
             with open(os.path.join(self.new_folder, 'pic%s' % i + '.jpg'), 'wb') as  picture_file:
                 picture_file.write(picture_str)
             i += 1
-            
+
+
 p = GrabPicture()
 p.get_picture()
