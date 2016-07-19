@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup
 
 class GrabPicture:
     def __init__(self):
-        self.web_url = set([ 'http://tieba.baidu.com/p/2166231880','http://tieba.baidu.com/p/2125228667#!/l/p1'])
+        self.web_url = [ 'http://tieba.baidu.com/p/2166231880','http://tieba.baidu.com/p/2125228667#!/l/p1']
         self.picture_url = set()
-        self.new_folder ='E:\GrabPicture\img4'
+        self.new_folder ='E:\GrabPicture\img3'
 
     def get_picture(self):
         self.new_folder = self.creat_folder()
@@ -26,11 +26,11 @@ class GrabPicture:
             self.get_web_url(soup)
             i += 1
 
-        print i
-
     def get_web_url(self, soup):
-        for web_url in soup.find_all('link'):#, attrs={'class' : 'BDE_Image'}):
-            self.web_url.add(web_url.get('href'))
+        for web_url in soup.find_all('link'):
+            url =  web_url.get('href') #, attrs={'class' : 'BDE_Image'}):
+            if url.startswith('http:') and url not in self.web_url:
+                self.web_url.append(url)
 
 
     def creat_folder(self):
